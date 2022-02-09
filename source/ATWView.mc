@@ -234,7 +234,9 @@ class ATWView extends WatchUi.DataField {
             View.onUpdate(dc);
 
             dc.setPenWidth(3);
-            dc.setAntiAlias(true);
+            if (dc has :setAntiAlias) {
+                dc.setAntiAlias(true);
+            }
             dc.setColor(fg, bg);
             dc.fillCircle(indicatorX, indicatorY, indicatorR);
             dc.setColor(bg, bg);
