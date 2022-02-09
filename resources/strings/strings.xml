@@ -1,0 +1,11 @@
+<strings>
+    <string id="AppName">Windsock OWM</string>
+
+    <string id="NoWeather">No wind data</string>
+    <string id="NoKey">No API Key</string>
+
+    <string id="unitKph">km/h</string>
+    <string id="unitMph">mph</string>
+
+    <string id="owm_key">OpenWeatherMap API Key</string>
+</strings>
