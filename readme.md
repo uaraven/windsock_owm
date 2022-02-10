@@ -7,7 +7,7 @@ Connect IQ data field which displays wind direction relative to the direction yo
 This is an companion data field for [Windsock](https://github.com/uaraven/windsock) and it supports more devices and support more accurate wind data, but 
 requires more complex set up.
 
-Windsock OWM requires Connect IQ 3.1 and higher and works* on following devices:
+Windsock OWM requires Connect IQ 2.4 and higher and works* on following devices:
  
   - Edge 130
   - Edge 130+
