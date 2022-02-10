@@ -65,8 +65,7 @@ class ATWView extends WatchUi.DataField {
         noApiKey = WatchUi.loadResource(Rez.Strings.NoKey);
     
         var key = Application.Properties.getValue("owm_api_key");
-
-        hasApiKey = true; //key != null && key != "";
+        hasApiKey = key != null && key != "";
     }
 
     private function arrowToPoly( dx as Numeric, dy as Numeric, sz as Numeric, rot as Numeric) {
