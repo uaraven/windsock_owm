@@ -48,7 +48,7 @@ class ATWView extends WatchUi.DataField {
     private var noWeather as String;
     private var noApiKey as String;
 
-    private var apiKey as String;
+    private var hasApiKey as Boolean;
 
     function initialize() {
         DataField.initialize();
@@ -63,8 +63,10 @@ class ATWView extends WatchUi.DataField {
         kmh = WatchUi.loadResource(Rez.Strings.unitKph);
         noWeather = WatchUi.loadResource(Rez.Strings.NoWeather);
         noApiKey = WatchUi.loadResource(Rez.Strings.NoKey);
+    
+        var key = Application.Properties.getValue("owm_api_key");
 
-        apiKey = Application.Properties.getValue("owm_api_key");
+        hasApiKey = true; //key != null && key != "";
     }
 
     private function arrowToPoly( dx as Numeric, dy as Numeric, sz as Numeric, rot as Numeric) {
@@ -140,15 +142,11 @@ class ATWView extends WatchUi.DataField {
 
     function compute(info as Activity.Info) as Void {
         if (info has :currentLocation && info.currentLocation != null) {
-            System.println("Location from activity");
             setLocation(info.currentLocation);
         } else {
             var posInfo = Position.getInfo();
             if (posInfo.position != null) {
-                System.println("Location from last position");
                 setLocation(posInfo.position);
-            } else {
-                System.println("No current location");
             }
         }
         if (info has :currentHeading){
@@ -212,17 +210,17 @@ class ATWView extends WatchUi.DataField {
         var fg = Graphics.COLOR_BLACK;
         var bg = Graphics.COLOR_TRANSPARENT;
         if (getBackgroundColor() == Graphics.COLOR_BLACK) {
-            unit.setColor(Graphics.COLOR_WHITE);
+            unit.setColor(Graphics.COLOR_LT_GRAY);
             wind.setColor(Graphics.COLOR_WHITE);
             fg = Graphics.COLOR_BLACK;
             bg = Graphics.COLOR_WHITE;
         } else {
-            unit.setColor(Graphics.COLOR_BLACK);
+            unit.setColor(Graphics.COLOR_DK_GRAY);
             wind.setColor(Graphics.COLOR_BLACK);
             fg = Graphics.COLOR_WHITE;
             bg = Graphics.COLOR_BLACK;
         }
-        if (apiKey == "") {
+        if (!hasApiKey) {
             showErrorMsg(dc, noApiKey, bg);
         }
         if (mWindValid) {
@@ -259,6 +257,8 @@ class ATWView extends WatchUi.DataField {
     function showErrorMsg(dc, text, color) {
         var unit = View.findDrawableById("unit") as Text;
         var wind = View.findDrawableById("speed") as Text;
+        unit.setText("");
+        wind.setText("");
         // Call parent's onUpdate(dc) to redraw the layout
         View.onUpdate(dc);
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);

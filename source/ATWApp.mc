@@ -16,16 +16,10 @@ class ATWApp extends Application.AppBase {
     function initialize() {
         AppBase.initialize();
 
-        System.println("register for temporal event");
-        // Background.registerForTemporalEvent(new Time.Duration(5*60));
         var lastTime = Background.getLastTemporalEventTime();        
         var schedule = Time.now().add(ONE_MINUTE);
         if (lastTime != null) {
             schedule = lastTime.add(FIVE_MINUTES);
-        } else {
-            if (schedule.greaterThan(lastTime)) {
-                schedule = lastTime;
-            } 
         }
         var f = ATWUtils.formatTime(schedule);
         System.println("Scheduling for " + f);
@@ -39,10 +33,7 @@ class ATWApp extends Application.AppBase {
     // onStop() is called when your application is exiting
     function onStop(state as Dictionary?) as Void {
         if (!OWM.inBackground) {
-            System.println("Deleting temporal event");
             Background.deleteTemporalEvent();
-        } else {
-            System.println("Background app stop");
         }
     }
 
@@ -56,7 +47,6 @@ class ATWApp extends Application.AppBase {
     }
 
     function onBackgroundData(data) {
-        System.println("Got background data: "+ data);
         OWM.windData = data;
     }
 

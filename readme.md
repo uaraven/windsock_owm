@@ -4,7 +4,7 @@
 
 Connect IQ data field which displays wind direction relative to the direction you're moving. Designed for the Edge head units.
 
-This is an companion data field for [Windsock](https://github.com/uaraven/windsock) and it supports more devices and support more accurate wind data, but 
+This is an companion data field for [Windsock](https://github.com/uaraven/windsock) and it supports more devices and more accurate wind data, but 
 requires more complex set up.
 
 Windsock OWM requires Connect IQ 2.4 and higher and works* on following devices:
@@ -25,9 +25,11 @@ Data field displays direction the wind is coming at you and wind speed (units de
 
 ![](img/data_field.png)
 
-Arrow will change the color from green to red depending on the wind strength and direction, i.e. tailwind is always good(green) and light headwind is not a big deal either (green), but stronger headwind will be shown in orange or red.
+Arrow will change the color from green to red depending on the wind strength and direction, i.e. tailwind is always good(green) and light headwind is not a big deal either (green), but stronger headwind will be shown in orange or red (That obviously doesn't work on Edge 130).
 
 The windsock data field uses OpenWeatherMap as weather provider, you will need to register an API key and configure Windsock OWM to use it.
+
+The Windsock OWM requires Background, Communications and Positioning permissions to retrieve wind data in background from OpenWeatherMap.
 
 ## Configuration
 
@@ -49,7 +51,7 @@ You may want to double check that you're on Free plan in the "Billing plans" tab
 
 ## A note about correctness
 
-At the beginning there might be no wind data available or the wind data could be retrieved for the incorrect location (the last location where device was on). It may take from 1 to 5 minutes before Windsock OWM starts showing correct data. After that wind data is updated every 10 minutes.
+At the beginning of the ride, there might be no wind data available or the wind data could be retrieved for the incorrect location (the last location where device was on). It may take from 1 to 5 minutes before Windsock OWM starts showing correct data. After that wind data is updated every 10 minutes.
 
 Still, wind strength and direction shown by Windsock OWM may not reflect what you experience in the real life. Treat it as an approximate suggestion, not as the definite truth.
 

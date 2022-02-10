@@ -38,7 +38,9 @@ module OWM {
             lat = Application.Storage.getValue("bg_lat");
             lon = Application.Storage.getValue("bg_lon");
             inBackground = true;
-            System.println("init service delegate lat=" + lat + ", lon=" + lon);
+            if (apiKey == null || apiKey == "") {
+                System.println("No API Key configured");
+            }
         }
 
         public function reSignUp(delay as Numeric) as Void {
@@ -49,7 +51,6 @@ module OWM {
         }
 
         public function onTemporalEvent() as Void {
-            System.println("Temporal event, lat=" + lat + ", lon=" + lon);
             if (lat == null || lon == null) {
                 System.println("Location unknown, skipping OWM request");
                 reSignUp(SHORT_DELAY);
@@ -57,8 +58,7 @@ module OWM {
                 return;
             }
             reSignUp(LONG_DELAY);
-            if (apiKey != "") {
-                System.println("Query OWM");
+            if (apiKey != "" && apiKey != null) {
                 updateWeather();
             } else {
                 System.println("No API Key");
@@ -67,7 +67,6 @@ module OWM {
         }
 
         function onWeather(responseCode, data) {
-            System.println("OWM response " + responseCode);
             var result as Lang.Dictionary;
             if (responseCode != 200) {
                 result = {windValid => false};
@@ -84,7 +83,6 @@ module OWM {
                         windBearing => wind["deg"],
                         windSpeed => wind["speed"],
                         windValid => true};
-                    System.println("Received wind data: " + wind);                
                 }
             }
             Background.exit(result);
@@ -93,7 +91,6 @@ module OWM {
         // Query wind data from OpenWeatherMap
         function updateWeather() { 
             if (lat == null || lon == null) {
-                System.println("No location, cannot query OMN");
                 Background.exit({});
             }
             var url = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&apiKey=" + apiKey;
@@ -102,10 +99,7 @@ module OWM {
                 :method => Communications.HTTP_REQUEST_METHOD_GET,
                 :responseType => Communications.HTTP_RESPONSE_CONTENT_TYPE_JSON
             };
-
-            System.println("Requesting OWM");
             Communications.makeWebRequest(url, {}, options, self.method(:onWeather));
-            System.println("Done");
         }
     }
 
