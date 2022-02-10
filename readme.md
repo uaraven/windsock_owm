@@ -4,7 +4,7 @@
 
 Connect IQ data field which displays wind direction relative to the direction you're moving. Designed for the Edge head units.
 
-This is an companion data field for [Windsock](https://github.com/uaraven/windsock) and it supports more devices and support more frequent wind updates, but 
+This is an companion data field for [Windsock](https://github.com/uaraven/windsock) and it supports more devices and support more accurate wind data, but 
 requires more complex set up.
 
 Windsock OWM requires Connect IQ 3.1 and higher and works* on following devices:
@@ -49,7 +49,7 @@ You may want to double check that you're on Free plan in the "Billing plans" tab
 
 ## A note about correctness
 
-At the beginning there might be no wind data available or the wind data could be retrieved for the incorrect location (the last location where device was on). Windsock OWM continiusly updates weather data and 5 minutes into your ride you should get correct wind information for your location.
+At the beginning there might be no wind data available or the wind data could be retrieved for the incorrect location (the last location where device was on). It may take from 1 to 5 minutes before Windsock OWM starts showing correct data. After that wind data is updated every 10 minutes.
 
 Still, wind strength and direction shown by Windsock OWM may not reflect what you experience in the real life. Treat it as an approximate suggestion, not as the definite truth.
 

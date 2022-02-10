@@ -3,9 +3,16 @@ using Toybox.Communications;
 using Toybox.Timer;
 using Toybox.System;
 using Toybox.Background;
+using Toybox.Time;
+
+using ATWUtils;
 
 module OWM {
 
+    (:background)
+    const SHORT_DELAY = 5;  // delay when we wait for coordinates
+    (:background)
+    const LONG_DELAY = 10;  // delay after we got the weather for the first time
     (:background)
     public const windValid = "windValid";
     (:background)
@@ -34,13 +41,22 @@ module OWM {
             System.println("init service delegate lat=" + lat + ", lon=" + lon);
         }
 
+        public function reSignUp(delay as Numeric) as Void {
+            var now = Time.now();
+            var next = now.add(new Time.Duration(delay*60));
+            System.println("Scheduling next weather retrieval for " + ATWUtils.formatTime(next));
+            Background.registerForTemporalEvent(next);
+        }
+
         public function onTemporalEvent() as Void {
             System.println("Temporal event, lat=" + lat + ", lon=" + lon);
             if (lat == null || lon == null) {
                 System.println("Location unknown, skipping OWM request");
+                reSignUp(SHORT_DELAY);
                 Background.exit({});
                 return;
             }
+            reSignUp(LONG_DELAY);
             if (apiKey != "") {
                 System.println("Query OWM");
                 updateWeather();

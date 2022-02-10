@@ -5,6 +5,10 @@ import Toybox.Background;
 import Toybox.Time;
 
 import OWM;
+import ATWUtils;
+
+const FIVE_MINUTES = new Time.Duration(5 * 60);
+const ONE_MINUTE = new Time.Duration(1 * 60);
 
 (:background)
 class ATWApp extends Application.AppBase {
@@ -13,7 +17,19 @@ class ATWApp extends Application.AppBase {
         AppBase.initialize();
 
         System.println("register for temporal event");
-        Background.registerForTemporalEvent(new Time.Duration(5*60));
+        // Background.registerForTemporalEvent(new Time.Duration(5*60));
+        var lastTime = Background.getLastTemporalEventTime();        
+        var schedule = Time.now().add(ONE_MINUTE);
+        if (lastTime != null) {
+            schedule = lastTime.add(FIVE_MINUTES);
+        } else {
+            if (schedule.greaterThan(lastTime)) {
+                schedule = lastTime;
+            } 
+        }
+        var f = ATWUtils.formatTime(schedule);
+        System.println("Scheduling for " + f);
+        Background.registerForTemporalEvent(schedule);
     }
 
     // onStart() is called on application start up

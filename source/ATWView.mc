@@ -223,8 +223,6 @@ class ATWView extends WatchUi.DataField {
             bg = Graphics.COLOR_BLACK;
         }
         if (apiKey == "") {
-            unit.setText("");
-            wind.setText("");
             showErrorMsg(dc, noApiKey, bg);
         }
         if (mWindValid) {
@@ -253,19 +251,23 @@ class ATWView extends WatchUi.DataField {
             dc.setColor(bg, fg);
             drawPoly(dc, poly);
         } else {
-            unit.setText("");
-            wind.setText("");
             showErrorMsg(dc, noWeather, bg);
         }
 
     }
 
     function showErrorMsg(dc, text, color) {
+        var unit = View.findDrawableById("unit") as Text;
+        var wind = View.findDrawableById("speed") as Text;
         // Call parent's onUpdate(dc) to redraw the layout
         View.onUpdate(dc);
         dc.setColor(color, Graphics.COLOR_TRANSPARENT);
-        dc.drawText(dc.getWidth() / 2, dc.getHeight() / 2, Graphics.FONT_SMALL, text, Graphics.TEXT_JUSTIFY_CENTER + Graphics.TEXT_JUSTIFY_VCENTER);
+        var td = dc.getTextDimensions(text, Graphics.FONT_SMALL);
+        var font = Graphics.FONT_SMALL;
+        if (td[0] > dc.getWidth() || td[1] > dc.getHeight()) { // mostly for Edge 130, others do just fine
+            font = Graphics.FONT_XTINY;
+        }
+        dc.drawText(dc.getWidth() / 2, dc.getHeight() / 2, font, text, Graphics.TEXT_JUSTIFY_CENTER + Graphics.TEXT_JUSTIFY_VCENTER);
     }
 
- 
 }
