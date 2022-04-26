@@ -12,13 +12,13 @@ In the "Create key" input type the name of the key (Windsock OWM, or anything el
 
 ![](owm_create_key.png)
 
-_Don't use the key from the image above, it is invalid_.
-
 Copy generated key from the web page
 
 ![](owm_generated_key.png)
 
- and insert it into Windsock OWM configuration in Garmin Connect Mobile.
+and insert it into Windsock OWM configuration in Garmin Connect Mobile.
+
+_Don't use the key from the image above, it is invalid_.
 
 For this open Connect IQ app on the phone, select your Edge device and tap on "My Data Fields", select `Windsock OWM` in the list of datafields and tap on settings
 
