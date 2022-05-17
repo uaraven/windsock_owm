@@ -68,7 +68,8 @@ class ATWView extends WatchUi.DataField {
         hasApiKey = key != null && key != "";
     }
 
-    private function arrowToPoly( dx as Numeric, dy as Numeric, sz as Numeric, rot as Numeric) {
+    private function arrowToPoly( dx as Numeric, dy as Numeric, sz as Numeric, rotD as Numeric) {
+        var rot = Math.toRadians(rotD);
         var result = new [arrow.size()];
         for (var i = 0; i < arrow.size(); i++) {
             result[i] = arrow[i].scaleRotateTranslate(sz, rot, dx, dy).asArray();
@@ -169,7 +170,7 @@ class ATWView extends WatchUi.DataField {
     }
 
     function getArrowColor() {
-        var heading = (180 - (mHeading - mWindBearing).toLong()) % 360;
+        var heading = (mHeading - mWindBearing).toLong() % 360;
         var vy = 0;
         if (heading >=125 && heading <= 235) {
             vy = mWindSpeedMs;
@@ -238,8 +239,7 @@ class ATWView extends WatchUi.DataField {
             dc.drawCircle(indicatorX, indicatorY, indicatorR);
             dc.setPenWidth(1);
 
-            var heading = 180-(mHeading - mWindBearing).toLong() % 360;
-            heading = Math.toRadians(heading);
+            var heading = -(mHeading - mWindBearing).toLong() % 360;
 
             var poly = arrowToPoly(indicatorX, indicatorY ,indicatorR, heading);
             var color = getArrowColor();
@@ -247,8 +247,22 @@ class ATWView extends WatchUi.DataField {
             dc.fillPolygon(poly);
             dc.setColor(bg, fg);
             drawPoly(dc, poly);
+
+            if (dc.getHeight() > indicatorY + indicatorR + 60) {
+                var y = indicatorY + indicatorR + 40;
+                var wpoly = arrowToPoly(dc.getWidth()-40, y, 20, mWindBearing);
+                dc.setColor(Graphics.COLOR_DK_BLUE, bg);
+                dc.fillPolygon(wpoly);
+            }
         } else {
             showErrorMsg(dc, noWeather, bg);
+        }
+
+        if (dc.getHeight() > indicatorY + indicatorR + 60) {
+            var y = indicatorY + indicatorR + 40;
+            var hpoly = arrowToPoly(40, y, 20, mHeading);
+            dc.setColor(Graphics.COLOR_DK_GREEN, bg);
+            dc.fillPolygon(hpoly);
         }
 
     }
