@@ -47,7 +47,11 @@ class ATWApp extends Application.AppBase {
     }
 
     function onBackgroundData(data) {
-        OWM.windData = data;
+        if (OWM.windData[OWM.windValid] && !data[OWM.windValid] {
+            System.println("No valid wind data in update, ignoring it");
+        } else {
+            OWM.windData = data;
+        }
     }
 
 }
