@@ -61,7 +61,7 @@ module OWM {
             if (apiKey != "" && apiKey != null) {
                 updateWeather();
             } else {
-                System.println("No API Key");
+                System.println("No API Key"); 
                 Background.exit({});
             }
         }
@@ -79,6 +79,8 @@ module OWM {
                     System.println(data);
                     result = {windValid => false};
                 } else {
+                    System.print("Received OWM response: ");
+                    System.println(wind);
                     result = {
                         windBearing => wind["deg"],
                         windSpeed => wind["speed"],
@@ -93,6 +95,7 @@ module OWM {
             if (lat == null || lon == null) {
                 Background.exit({});
             }
+            System.println("Weather request at (" + lat + ", " + lon + ")");
             var url = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&apiKey=" + apiKey;
 
             var options = {

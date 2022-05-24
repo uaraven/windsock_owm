@@ -8,7 +8,7 @@ import OWM;
 import ATWUtils;
 
 const FIVE_MINUTES = new Time.Duration(5 * 60);
-const ONE_MINUTE = new Time.Duration(1 * 60);
+const ONE_MINUTE = new Time.Duration(30);
 
 (:background)
 class ATWApp extends Application.AppBase {
@@ -47,7 +47,8 @@ class ATWApp extends Application.AppBase {
     }
 
     function onBackgroundData(data) {
-        if (OWM.windData[OWM.windValid] && !data[OWM.windValid] {
+        var existingDataValid = OWM.windData != null && OWM.windData[OWM.windValid];
+        if (existingDataValid && !data[OWM.windValid]) {
             System.println("No valid wind data in update, ignoring it");
         } else {
             OWM.windData = data;

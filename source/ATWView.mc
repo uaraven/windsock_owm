@@ -151,7 +151,7 @@ class ATWView extends WatchUi.DataField {
         }
         if (info has :currentHeading){
             if (info.currentHeading != null) {
-                mHeading = Math.toDegrees(info.currentHeading as Number);
+                mHeading = normalizeAngle(Math.toDegrees(info.currentHeading as Number));
             } else {
                 mHeading = 0;
             }
@@ -159,7 +159,7 @@ class ATWView extends WatchUi.DataField {
         if (OWM.windData != null && OWM.windData[OWM.windValid] != null && OWM.windData[OWM.windValid]) {
             mWindSpeedMs = OWM.windData[OWM.windSpeed];
             mWindSpeed = convertSpeed(OWM.windData[OWM.windSpeed]);
-            mWindBearing = OWM.windData[OWM.windBearing];
+            mWindBearing = normalizeAngle(OWM.windData[OWM.windBearing]);
             mWindValid = true;
         } else {
             mWindSpeed = -1;
@@ -170,7 +170,7 @@ class ATWView extends WatchUi.DataField {
     }
 
     function getArrowColor() {
-        var heading = (mHeading - mWindBearing).toLong() % 360;
+        var heading = relativeWindDirection(mHeading, mWindBearing);
         var vy = 0;
         if (heading >=125 && heading <= 235) {
             vy = mWindSpeedMs;
@@ -239,7 +239,7 @@ class ATWView extends WatchUi.DataField {
             dc.drawCircle(indicatorX, indicatorY, indicatorR);
             dc.setPenWidth(1);
 
-            var heading = -(mHeading - mWindBearing).toLong() % 360;
+            var heading = relativeWindDirection(mHeading, mWindBearing);
 
             var poly = arrowToPoly(indicatorX, indicatorY ,indicatorR, heading);
             var color = getArrowColor();
@@ -250,7 +250,7 @@ class ATWView extends WatchUi.DataField {
 
             if (dc.getHeight() > indicatorY + indicatorR + 60) {
                 var y = indicatorY + indicatorR + 40;
-                var wpoly = arrowToPoly(dc.getWidth()-40, y, 20, mWindBearing);
+                var wpoly = arrowToPoly(dc.getWidth()-40, y, 20, mWindBearing+180);
                 dc.setColor(Graphics.COLOR_DK_BLUE, bg);
                 dc.fillPolygon(wpoly);
             }
@@ -265,6 +265,17 @@ class ATWView extends WatchUi.DataField {
             dc.fillPolygon(hpoly);
         }
 
+    }
+
+    function relativeWindDirection(heading, windDir) {
+        return  normalizeAngle((windDir - heading+180).toLong());
+    }
+
+    function normalizeAngle(angle) {
+        while (angle < 0) {
+            angle += 360;
+        }
+        return angle % 360;
     }
 
     function showErrorMsg(dc, text, color) {
