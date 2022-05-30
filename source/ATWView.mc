@@ -275,7 +275,7 @@ class ATWView extends WatchUi.DataField {
         while (angle < 0) {
             angle += 360;
         }
-        return angle % 360;
+        return angle.toLong() % 360;
     }
 
     function showErrorMsg(dc, text, color) {
