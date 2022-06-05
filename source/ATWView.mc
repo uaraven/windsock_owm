@@ -9,6 +9,7 @@ import Toybox.Position;
 import Toybox.Application;
 
 import OWM;
+import ATWUtils;
 
 class ATWView extends WatchUi.DataField {
 
@@ -33,7 +34,7 @@ class ATWView extends WatchUi.DataField {
 
     hidden var mLastWeatherUpdate as Numeric;
 
-    hidden var mHeading as Numeric;
+    hidden var mHeading;
     hidden var mWindSpeed as Numeric;
     hidden var mWindSpeedMs as Numeric;
     hidden var mWindBearing as Numeric;
@@ -52,7 +53,7 @@ class ATWView extends WatchUi.DataField {
 
     function initialize() {
         DataField.initialize();
-        mHeading = 0.0f;
+        mHeading = new ATWUtils.Averager(5);
         mWindSpeed = 0.0f;
         mWindSpeedMs = -1;
         mWindBearing = 0.0f;
@@ -151,9 +152,9 @@ class ATWView extends WatchUi.DataField {
         }
         if (info has :currentHeading){
             if (info.currentHeading != null) {
-                mHeading = normalizeAngle(Math.toDegrees(info.currentHeading as Number));
+                mHeading.add(normalizeAngle(Math.toDegrees(info.currentHeading as Number)));
             } else {
-                mHeading = 0;
+                mHeading.add(0);
             }
         }
         if (OWM.windData != null && OWM.windData[OWM.windValid] != null && OWM.windData[OWM.windValid]) {
@@ -170,13 +171,17 @@ class ATWView extends WatchUi.DataField {
     }
 
     function getArrowColor() {
-        var heading = relativeWindDirection(mHeading, mWindBearing);
+        var heading = relativeWindDirection(mHeading.get(), mWindBearing);
         var vy = 0;
         if (heading >=125 && heading <= 235) {
             vy = mWindSpeedMs;
         } else {
-            vy = -mWindSpeedMs * Math.cos(Math.toRadians(heading)) * 1.5;
+            vy = -mWindSpeedMs * Math.cos(Math.toRadians(heading)) ;
         }
+        // System.print("Vy=");
+        // System.print(vy);
+        // System.print(", Heading:");
+        // System.println(heading);
         // chose color mapping based on heading
         var colorMap = headwindColors;
         for (var i = colorMap.size()-1 ; i >= 0; i--) {
@@ -239,7 +244,7 @@ class ATWView extends WatchUi.DataField {
             dc.drawCircle(indicatorX, indicatorY, indicatorR);
             dc.setPenWidth(1);
 
-            var heading = relativeWindDirection(mHeading, mWindBearing);
+            var heading = relativeWindDirection(mHeading.get(), mWindBearing);
 
             var poly = arrowToPoly(indicatorX, indicatorY ,indicatorR, heading);
             var color = getArrowColor();
@@ -260,7 +265,7 @@ class ATWView extends WatchUi.DataField {
 
         if (dc.getHeight() > indicatorY + indicatorR + 60) {
             var y = indicatorY + indicatorR + 40;
-            var hpoly = arrowToPoly(40, y, 20, mHeading);
+            var hpoly = arrowToPoly(40, y, 20, mHeading.get());
             dc.setColor(Graphics.COLOR_DK_GREEN, bg);
             dc.fillPolygon(hpoly);
         }
