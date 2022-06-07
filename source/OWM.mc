@@ -38,7 +38,7 @@ module OWM {
             lat = Application.Storage.getValue("bg_lat");
             lon = Application.Storage.getValue("bg_lon");
             inBackground = true;
-            if (apiKey == null || apiKey == "") {
+            if (apiKey == null || apiKey.equals("")) {
                 System.println("No API Key configured");
             }
         }
@@ -58,7 +58,7 @@ module OWM {
                 return;
             }
             reSignUp(LONG_DELAY);
-            if (apiKey != "" && apiKey != null) {
+            if (apiKey != null && !apiKey.equals("")) {
                 updateWeather();
             } else {
                 System.println("No API Key"); 
