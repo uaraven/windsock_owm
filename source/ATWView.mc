@@ -257,6 +257,8 @@ class ATWView extends WatchUi.DataField {
             dc.setColor(bg, fg);
             drawPoly(dc, poly);
 
+            drawTick(dc,  Graphics.COLOR_RED, -mHeading.get(), 2);
+
             if (dc.getHeight() > indicatorY + indicatorR + 60) {
                 var y = indicatorY + indicatorR + 40;
                 var wpoly = arrowToPoly(dc.getWidth()-40, y, 20, mWindBearing+180);
@@ -274,6 +276,14 @@ class ATWView extends WatchUi.DataField {
             dc.fillPolygon(hpoly);
         }
 
+    }
+
+    function drawTick(dc, color, heading, size) {
+        var headingRad = Math.toRadians(heading);
+        var vout = new Vector2(0, indicatorR + size/2).rotate(headingRad);
+        var vin = new Vector2(0, indicatorR - size/2).rotate(headingRad);
+
+        dc.drawLine(vout.getX(), vout.getY(), vin.getX(), vin.getY());
     }
 
     function relativeWindDirection(heading, windDir) {
