@@ -9,6 +9,14 @@ class Vector2 {
         self.y = y;
     }
 
+    public function getX() {
+        return self.x;
+    }
+
+    public function getY() {
+        return self.y;
+    }
+
     public function length() as Numeric {
         return Math.sqrt(self.x * self.x + self.y * self.y);
     }
