@@ -153,12 +153,10 @@ class ATWView extends WatchUi.DataField {
                 setLocation(posInfo.position);
             }
         }
-        if (info has :currentHeading){
-            if (info.currentHeading != null) {
-                mHeading.add(normalizeAngle(Math.toDegrees(info.currentHeading as Number)));
-            } else {
-                mHeading.add(0);
-            }
+        if (info has :track) {
+            addToHeading(info.track);
+        } else if (info has :currentHeading) {
+            addToHeading(info.currentHeading);
         }
         if (OWM.windData != null && OWM.windData[OWM.windValid] != null && OWM.windData[OWM.windValid]) {
             mWindSpeedMs = OWM.windData[OWM.windSpeed];
@@ -170,6 +168,14 @@ class ATWView extends WatchUi.DataField {
             mWindSpeedMs = -1;
             mWindBearing = 0;
             mWindValid = false;
+        }
+    }
+
+    function addToHeading(val) {
+        if (val != null) {
+            mHeading.add(normalizeAngle(Math.toDegrees(val as Number)));
+        } else {
+            mHeading.add(0);
         }
     }
 
