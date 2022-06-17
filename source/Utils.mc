@@ -1,7 +1,56 @@
 import Toybox.Time;
 import Toybox.Lang;
+import Toybox.Application;
 
 module ATWUtils {
+
+    const NO_DEBUG = 0;
+    const CALC_COG = 1;
+    const HEADING = 2;
+    const STORAGE = 3;
+
+    public function initDebug() {
+        try {
+            Application.Storage.getValue("debug_mode");
+        } catch(e) {
+            Application.Storage.setValue("debug_mode", 0);
+            Application.Storage.setValue("wind", 3);
+            Application.Storage.setValue("wind_speed", 1.6);
+            Application.Storage.setValue("heading", 55);
+        }
+    }
+
+    public function getDebugMode() {
+        return safeGetStorage("debug_mode");
+    }
+
+    public function debugReadWind() {
+        return safeGetStorage("wind");
+    }
+
+    public function debugReadWindSpeed() {
+        var ws = safeGetStorage("wind_speed");
+        if (ws == 0) {
+            ws = 1;
+        }
+        return ws;
+    }
+
+    public function debugReadHeading() {
+        return safeGetStorage("heading");
+    }
+
+    public function safeGetStorage(key) {
+        try {
+            var value = Application.Storage.getValue(key);
+            if (value == null) {
+                value = 0;
+            }
+            return value;
+        } catch(e) {
+            return 0;
+        }
+    }
 
     (:background)
     public function formatTime(t as Time.Moment) as String {

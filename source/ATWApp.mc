@@ -24,6 +24,8 @@ class ATWApp extends Application.AppBase {
         var f = ATWUtils.formatTime(schedule);
         System.println("Scheduling for " + f);
         Background.registerForTemporalEvent(schedule);
+
+        ATWUtils.initDebug();
     }
 
     // onStart() is called on application start up

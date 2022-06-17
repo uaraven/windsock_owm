@@ -35,12 +35,30 @@ class Vector2 {
         return new Vector2(nx, ny);
     }
 
+    public function subtract(v as Vector2) as Vector2 {
+        return new Vector2(self.x - v.getX(), self.y - v.getY());
+    }
+
     public function scaleRotateTranslate(scale as Numeric, rot as Numeric, dx as Numeric, dy as Numeric) as Vector2 {
         var x = self.x * scale;
         var y = self.y * scale;
         var nx = Math.cos(rot) * x - Math.sin(rot) * y;
         var ny = Math.sin(rot) * x + Math.cos(rot) * y;
         return new Vector2(nx + dx, ny + dy);
+    }
+
+    public function dot(other as Vector2) as Double {
+        return self.x * other.getX() + self.y * other.getY();
+    }
+
+    public function angleBetween(other as Vector2) as Double {
+        var dot = self.dot(other);
+        var den = self.length() * other.length();
+        var a = 0;
+        if (den != 0) {
+            a = Math.acos(dot / den);
+        }
+        return Math.toDegrees(a);
     }
 
     public function asArray() as Array<Numeric> {

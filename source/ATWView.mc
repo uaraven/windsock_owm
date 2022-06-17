@@ -35,6 +35,7 @@ class ATWView extends WatchUi.DataField {
     hidden var mLastWeatherUpdate as Numeric;
 
     hidden var mHeading;
+    hidden var mDirection;
     hidden var mWindSpeed as Numeric;
     hidden var mWindSpeedMs as Numeric;
     hidden var mWindBearing as Numeric;
@@ -51,8 +52,13 @@ class ATWView extends WatchUi.DataField {
 
     private var hasApiKey as Boolean;
 
+    private var debugMode;
+
     function initialize() {
         DataField.initialize();
+
+        mDirection = new Direction();
+
         mHeading = new ATWUtils.Averager(5);
         mWindSpeed = 0.0f;
         mWindSpeedMs = -1;
@@ -69,6 +75,10 @@ class ATWView extends WatchUi.DataField {
         hasApiKey = key != null && !key.equals("");
         if (!hasApiKey) {
             System.println("No API Key");
+        }
+        debugMode = ATWUtils.getDebugMode();
+        if (debugMode != 0) {
+            System.println("Debug mode: " + debugMode.toString());
         }
     }
 
@@ -147,16 +157,13 @@ class ATWView extends WatchUi.DataField {
     function compute(info as Activity.Info) as Void {
         if (info has :currentLocation && info.currentLocation != null) {
             setLocation(info.currentLocation);
+            mDirection.addLocation(info.currentLocation.toDegrees());
         } else {
             var posInfo = Position.getInfo();
             if (posInfo.position != null) {
                 setLocation(posInfo.position);
+                mDirection.addLocation(posInfo.position.toDegrees());
             }
-        }
-        if (info has :track) {
-            addToHeading(info.track);
-        } else if (info has :currentHeading) {
-            addToHeading(info.currentHeading);
         }
         if (OWM.windData != null && OWM.windData[OWM.windValid] != null && OWM.windData[OWM.windValid]) {
             mWindSpeedMs = OWM.windData[OWM.windSpeed];
@@ -169,11 +176,43 @@ class ATWView extends WatchUi.DataField {
             mWindBearing = 0;
             mWindValid = false;
         }
+        switch (debugMode) {
+            case ATWUtils.NO_DEBUG:
+                useHeading(info);
+            case ATWUtils.HEADING:
+                useHeading(info);
+                useDebugWind();
+                break;
+            case ATWUtils.CALC_COG:
+                addToHeading(mDirection.getHeading());
+                useDebugWind();
+                break;
+            case ATWUtils.STORAGE:
+                var heading = ATWUtils.debugReadHeading();
+                addToHeading(heading);
+
+                useDebugWind();
+        }
+    }
+
+    function useDebugWind() {
+        mWindBearing = ATWUtils.debugReadWind();
+        mWindSpeedMs = ATWUtils.debugReadWindSpeed();
+        mWindSpeed = convertSpeed(mWindSpeedMs);
+        mWindValid = true;    
+    }
+
+    function useHeading(info as Activity.Info) {
+        if (info has :currentHeading && info.currentHeading != null) {
+            addToHeading(Math.toDegrees(info.currentHeading));
+        } else {
+            addToHeading(0);
+        }
     }
 
     function addToHeading(val) {
         if (val != null) {
-            mHeading.add(normalizeAngle(Math.toDegrees(val as Number)));
+            mHeading.add(normalizeAngle(val));
         } else {
             mHeading.add(0);
         }
@@ -263,13 +302,18 @@ class ATWView extends WatchUi.DataField {
             dc.setColor(bg, fg);
             drawPoly(dc, poly);
 
-            drawTick(dc,  Graphics.COLOR_RED, -mHeading.get(), 2);
+            drawTick(dc,  Graphics.COLOR_RED, -mHeading.get()-180, indicatorR, 7, indicatorX, indicatorY);
+            drawTick(dc,  Graphics.COLOR_DK_GREEN, mHeading.get()+180, indicatorR, 7, indicatorX, indicatorY);
+            drawTick(dc,  Graphics.COLOR_DK_BLUE, mWindBearing+180, indicatorR, 7, indicatorX, indicatorY);
 
             if (dc.getHeight() > indicatorY + indicatorR + 60) {
                 var y = indicatorY + indicatorR + 40;
                 var wpoly = arrowToPoly(dc.getWidth()-40, y, 20, mWindBearing+180);
                 dc.setColor(Graphics.COLOR_DK_BLUE, bg);
                 dc.fillPolygon(wpoly);
+                var deg = mWindBearing.toLong().toString();
+                dc.setColor(Graphics.COLOR_DK_BLUE, fg);
+                dc.drawText(dc.getWidth() - 40, y + 30, Graphics.FONT_XTINY, deg, Graphics.TEXT_JUSTIFY_CENTER + Graphics.TEXT_JUSTIFY_VCENTER);
             }
         } else {
             showErrorMsg(dc, noWeather, bg);
@@ -280,15 +324,20 @@ class ATWView extends WatchUi.DataField {
             var hpoly = arrowToPoly(40, y, 20, mHeading.get());
             dc.setColor(Graphics.COLOR_DK_GREEN, bg);
             dc.fillPolygon(hpoly);
+            var deg = mHeading.get().toLong().toString();
+            dc.setColor(Graphics.COLOR_DK_GREEN, fg);
+            dc.drawText(40, y + 30, Graphics.FONT_XTINY, deg, Graphics.TEXT_JUSTIFY_CENTER + Graphics.TEXT_JUSTIFY_VCENTER);
+            drawTick(dc, Graphics.COLOR_RED, 180, 20, 3, 40, y);
         }
 
     }
 
-    function drawTick(dc, color, heading, size) {
+    function drawTick(dc, color, heading, radius, size, cx, cy) {
         var headingRad = Math.toRadians(heading);
-        var vout = new Vector2(0, indicatorR + size/2).rotate(headingRad);
-        var vin = new Vector2(0, indicatorR - size/2).rotate(headingRad);
-
+        var vout = new Vector2(0, radius + size/2).rotate(headingRad).translate(cx, cy);
+        var vin = new Vector2(0, radius - size/2).rotate(headingRad).translate(cx, cy);
+        dc.setColor(color, color);
+        dc.setPenWidth(size/2);
         dc.drawLine(vout.getX(), vout.getY(), vin.getX(), vin.getY());
     }
 
